@@ -1,12 +1,5 @@
 const URL = 'http://localhost:8080'
 
-function handleHttpErrors(res) {
-  if (!res.ok) {
-    return Promise.reject({ status: res.status, fullError: res.json() })
-  }
-  return res.json()
-}
-
 function apiFacade() {
   const setToken = (token) => {
     localStorage.setItem('jwtToken', token)
@@ -20,21 +13,32 @@ function apiFacade() {
   }
   const logout = () => {
     localStorage.removeItem('jwtToken')
+    window.location.reload()
   }
 
-  const login = (user, password) => {
-    const options = makeOptions('POST', true, { username: user, password: password })
-    return fetch(URL + '/api/login', options)
-      .then(handleHttpErrors)
-      .then((res) => {
-        setToken(res.token)
-      })
+  async function login(username, password) {
+    const options = makeOptions('POST', true, {
+      username: username,
+      password: password,
+    })
+    const data = await fetch(URL + '/api/login', options)
+    const res = await data.json()
+    return res
   }
 
-  const fetchData = () => {
-    const options = makeOptions('GET', true) //True add's the token
-    return fetch(URL + '/api/info/user', options).then(handleHttpErrors)
+  // fetch data and catch possible errors
+  async function fetchAdminData() {
+    const options = makeOptions('GET', true)
+    const data = await fetch(URL + '/api/info/admin', options)
+    return data.json()
   }
+
+  async function fetchUserData() {
+    const options = makeOptions('GET', true)
+    const data = await fetch(URL + '/api/info/user', options)
+    return data.json()
+  }
+
   const makeOptions = (method, addToken, body) => {
     var opts = {
       method: method,
@@ -58,7 +62,8 @@ function apiFacade() {
     loggedIn,
     login,
     logout,
-    fetchData,
+    fetchAdminData,
+    fetchUserData,
   }
 }
 const facade = apiFacade()

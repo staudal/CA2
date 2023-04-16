@@ -5,6 +5,8 @@ import DesktopNavMenu from './DesktopNavMenu'
 import NavHamburgerButton from './NavHamburgerButton'
 import MobileNavMenu from './MobileNavMenu'
 import LogInButton from './LogInButton'
+import LogOutButton from './LogOutButton'
+import facade from '../../facade/ApiFacade'
 
 const navigation = [
   { name: 'Home', href: '/', current: false },
@@ -30,7 +32,7 @@ export default function Example() {
                 <NavLogo />
                 <DesktopNavMenu navigation={navigation} />
               </div>
-              <LogInButton />
+              {facade.loggedIn() ? <LogOutButton /> : <LogInButton />}
               <NavHamburgerButton open={open} />
             </div>
           </div>
